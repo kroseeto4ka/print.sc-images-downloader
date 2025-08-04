@@ -40,6 +40,27 @@ private extension FindImageViewController {
         setupTryButton()
         setupInfoLabel()
         setupAction()
+        setupGestureRecognizers()
+    }
+    
+    func setupGestureRecognizers() {
+        let imageTap = UILongPressGestureRecognizer(target: self, action: #selector(handleImagePress(_:)))
+        image.isUserInteractionEnabled = true
+        image.addGestureRecognizer(imageTap)
+        
+        let labelTap = UILongPressGestureRecognizer(target: self, action: #selector(handleLabelPress(_:)))
+        infoLabel.isUserInteractionEnabled = true
+        infoLabel.addGestureRecognizer(labelTap)
+    }
+    
+    @objc private func handleImagePress(_ sender: UITapGestureRecognizer) {
+        guard sender.state == .began else { return }
+        presenter?.copyTappedImage(image: self.image.image)
+    }
+    
+    @objc private func handleLabelPress(_ sender: UITapGestureRecognizer) {
+        guard sender.state == .began else { return }
+        presenter?.copyTappedURL(url: infoLabel.text)
     }
     
     func setupTryButton() {
@@ -52,18 +73,35 @@ private extension FindImageViewController {
         infoLabel.isHidden = true
         infoLabel.font = .systemFont(ofSize: 20, weight: .light)
         infoLabel.textAlignment = .center
-        
+        infoLabel.numberOfLines = 0
     }
     
     func clearScreen() {
         image.image = .none
         infoLabel.isHidden = true
+        
+        infoLabel.isUserInteractionEnabled = false
+        image.isUserInteractionEnabled = false
+    }
+    
+    func disableButton() {
+        tryButton.isEnabled = false
+        tryButton.alpha = 0.5
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.tryButton.isEnabled = true
+            self.tryButton.alpha = 1
+        }
+    }
+    
+    func action() {
+        self.clearScreen()
+        self.disableButton()
+        self.presenter?.fetchRandomImage()
     }
     
     func setupAction() {
         let tryAction = UIAction { _ in
-            self.clearScreen()
-            self.presenter?.fetchRandomImage()
+            self.action()
         }
         
         tryButton.addAction(tryAction, for: .touchUpInside)
@@ -99,10 +137,12 @@ private extension FindImageViewController {
 extension FindImageViewController: IFindImageViewController {
     func display(image: UIImage, url: URL) {
         self.image.image = image
+        self.image.isUserInteractionEnabled = true
         
         self.infoLabel.text = url.absoluteString
         self.infoLabel.isHidden = false
         self.infoLabel.textColor = .gray
+        self.infoLabel.isUserInteractionEnabled = true
     }
     
     func display(error: String) {

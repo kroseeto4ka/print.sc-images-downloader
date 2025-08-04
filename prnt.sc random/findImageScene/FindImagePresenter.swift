@@ -10,7 +10,8 @@ import UIKit
 
 protocol IFindImagePresenter {
     func fetchRandomImage()
-    
+    func copyTappedImage(image: UIImage?)
+    func copyTappedURL(url: String?)
 }
 
 final class FindImagePresenter {
@@ -70,6 +71,24 @@ private extension FindImagePresenter {
 
 //MARK: - IFindImagePresenter
 extension FindImagePresenter: IFindImagePresenter {
+    func copyTappedImage(image: UIImage?) {
+        guard let image = image else { return }
+        UIPasteboard.general.image = image
+        
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+        feedbackGenerator.impactOccurred()
+    }
+    
+    func copyTappedURL(url: String?) {
+        guard let url = url else { return }
+        if !url.isEmpty {
+            UIPasteboard.general.string = url
+        }
+        
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+        feedbackGenerator.impactOccurred()
+    }
+    
     func fetchRandomImage() {
         DispatchQueue.main.async {
             self.view?.displayLoading()
