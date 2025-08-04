@@ -31,7 +31,7 @@ extension WarningRouter: IWarningRouter {
             let findImageAssembly = FindImageAssembly(navigationController: navigationController)
             findImageAssembly.configure(viewController: findImageVC)
             
-            navigationController.pushViewController(findImageVC, animated: true)
+            navigationController.setViewControllers([findImageVC], animated: true)
         }
     }
 }
