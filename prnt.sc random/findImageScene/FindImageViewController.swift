@@ -8,7 +8,7 @@
 import UIKit
 
 protocol IFindImageViewController: AnyObject {
-    func display(image: UIImage, url: URL)
+    func display(imageModel: ImageModel)
     func display(error: String)
     func displayLoading()
 }
@@ -135,11 +135,11 @@ private extension FindImageViewController {
 }
 
 extension FindImageViewController: IFindImageViewController {
-    func display(image: UIImage, url: URL) {
-        self.image.image = image
+    func display(imageModel: ImageModel) {
+        self.image.image = imageModel.image
         self.image.isUserInteractionEnabled = true
         
-        self.infoLabel.text = url.absoluteString
+        self.infoLabel.text = imageModel.url
         self.infoLabel.isHidden = false
         self.infoLabel.textColor = .gray
         self.infoLabel.isUserInteractionEnabled = true

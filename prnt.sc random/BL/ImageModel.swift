@@ -7,7 +7,8 @@
 
 import UIKit
 
-struct RandomImage {
-    let url: String
-    let image: UIImage
+struct ImageModel {
+    var url: String?
+    var image: UIImage?
+    var error: String?
 }

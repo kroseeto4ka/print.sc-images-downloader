@@ -17,10 +17,12 @@ protocol IFindImagePresenter {
 final class FindImagePresenter {
     private weak var view: IFindImageViewController!
     let router: IFindImageRouter
+    private var randomImage: ImageModel?
     
     init(view: IFindImageViewController, router: IFindImageRouter) {
         self.router = router
         self.view = view
+        randomImage = ImageModel()
     }
 }
 
@@ -31,24 +33,28 @@ private extension FindImagePresenter {
             guard let self = self else { return }
             
             if let error = error {
+                randomImage?.error = "Download error: \(error.localizedDescription)"
                 DispatchQueue.main.async {
-                    self.view?.display(error: "Download error: \(error.localizedDescription)")
+                    self.view?.display(error: (self.randomImage?.error)!)
                 }
                 return
             }
             
             guard let data = data,
                   let image = UIImage(data: data),
-                  image.size.width > 10, image.size.height > 10
+                  image.size.width > 162, image.size.height > 82
             else {
+                randomImage?.error = "Error: Image is too small"
                 DispatchQueue.main.async {
-                    self.view?.display(error: "Error: Image is too small")
+                    self.view?.display(error: (self.randomImage?.error)!)
                 }
                 return
             }
+            randomImage?.image = image
+            randomImage?.url = url.absoluteString
             
             DispatchQueue.main.async {
-                self.view?.display(image: image, url: url)
+                self.view?.display(imageModel: self.randomImage!)
             }
         }.resume()
     }
@@ -99,8 +105,9 @@ extension FindImagePresenter: IFindImagePresenter {
         let pageURLString = baseURL + randomCode
         
         guard let pageURL = URL(string: pageURLString) else {
+            randomImage?.error = "Wrong URL"
             DispatchQueue.main.async {
-                self.view?.display(error: "Wrong URL")
+                self.view?.display(error: (self.randomImage?.error)!)
             }
             return
         }
@@ -109,8 +116,9 @@ extension FindImagePresenter: IFindImagePresenter {
             guard let self = self else { return }
             
             if let error = error {
+                randomImage?.error = "Page download error: \(error.localizedDescription)"
                 DispatchQueue.main.async {
-                    self.view?.display(error: "Page download error: \(error.localizedDescription)")
+                    self.view?.display(error: (self.randomImage?.error)!)
                 }
                 return
             }
@@ -120,8 +128,9 @@ extension FindImagePresenter: IFindImagePresenter {
                   let imageURL = extractImageURL(from: html),
                   let imageDownloadURL = URL(string: imageURL)
             else {
+                randomImage?.error = "error: Couldn't find image"
                 DispatchQueue.main.async {
-                    self.view?.display(error: "Couldn't find image")
+                    self.view?.display(error: (self.randomImage?.error)!)
                 }
                 return
             }
