@@ -18,7 +18,12 @@ extension FindImageAssembly: BaseAssembly {
     func configure(viewController: UIViewController) {
         guard let findImageVC = viewController as? FindImageViewController else { return }
         let router = FindImageRouter(navigationController: navigationController)
-        let presenter = FindImagePresenter(view: findImageVC as! IFindImageViewController, router: router)
+        let fetchManager = ImageFetchManager()
+        let clipboardManager = ClipboardManager()
+        let presenter = FindImagePresenter(view: findImageVC,
+                                           router: router,
+                                           fetchManager: fetchManager,
+                                           clipboardManager: clipboardManager)
         
         findImageVC.presenter = presenter
     }
