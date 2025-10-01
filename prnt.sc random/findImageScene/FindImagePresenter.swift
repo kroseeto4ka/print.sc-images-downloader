@@ -12,6 +12,8 @@ protocol IFindImagePresenter {
     func fetchRandomImage()
     func copyTappedImage(image: UIImage?)
     func copyTappedURL(url: String?)
+    func runImageCollectionFlow()
+    func saveImage()
 }
 
 final class FindImagePresenter {
@@ -19,15 +21,19 @@ final class FindImagePresenter {
     let router: IFindImageRouter
     private let imageFetchManager: IImageFetchManager
     private let clipboardManager: IClipboardManager
+    private let imageStore: IImageStoreManager
+    private var currentImage: ImageModel?
     
     init(view: IFindImageViewController,
          router: IFindImageRouter,
          fetchManager: IImageFetchManager,
-         clipboardManager: IClipboardManager) {
+         clipboardManager: IClipboardManager,
+         imageStore: IImageStoreManager) {
         self.router = router
         self.view = view
         self.imageFetchManager = fetchManager
         self.clipboardManager = clipboardManager
+        self.imageStore = imageStore
     }
 }
 
@@ -41,6 +47,14 @@ extension FindImagePresenter: IFindImagePresenter {
         clipboardManager.copyTappedURL(url: url)
     }
     
+    func saveImage() {
+        guard let image = currentImage else {
+            view.display(error: "Couldn't save data")
+            return
+        }
+        imageStore.save(image)
+    }
+    
     func fetchRandomImage() {
         DispatchQueue.main.async {
             self.view?.displayLoading()
@@ -51,16 +65,31 @@ extension FindImagePresenter: IFindImagePresenter {
                 return
             }
             
-            guard randomImage.image == nil else {
+            if let _ = randomImage.image {
+                // ✅ Успешная картинка
+                self?.currentImage = randomImage
                 DispatchQueue.main.async {
                     self?.view?.display(imageModel: randomImage)
                 }
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self?.view?.display(error: randomImage.error ?? "Error unwrapping error")
+            } else {
+                // ❌ Ошибка
+                self?.currentImage = randomImage
+                DispatchQueue.main.async {
+                    self?.view?.display(error: randomImage.error ?? "Unknown error")
+                }
             }
         }
+    }
+    
+    func runImageCollectionFlow() {
+        if imageStore.getAmount() == 0 {
+            return
+        }
+        
+        router.routeTo(target: FindImageRouter.Target.imageCollection)
+    }
+    
+    func getSavedImagesAmount() -> Int {
+        imageStore.getAmount()
     }
 }

@@ -20,10 +20,12 @@ extension FindImageAssembly: BaseAssembly {
         let router = FindImageRouter(navigationController: navigationController)
         let fetchManager = ImageFetchManager()
         let clipboardManager = ClipboardManager()
+        let storeManager = ImageStoreManager()
         let presenter = FindImagePresenter(view: findImageVC,
                                            router: router,
                                            fetchManager: fetchManager,
-                                           clipboardManager: clipboardManager)
+                                           clipboardManager: clipboardManager,
+        imageStore: ImageStoreManager())
         
         findImageVC.presenter = presenter
     }

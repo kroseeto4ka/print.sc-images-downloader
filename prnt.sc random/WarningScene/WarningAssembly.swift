@@ -21,6 +21,6 @@ extension WarningAssembly: BaseAssembly {
         let presenter = WarningPresenter(router: router)
         
         warningVC.presenter = presenter
-        presenter.view = warningVC //as? any IWarningViewController
+        presenter.view = warningVC
     }
 }

@@ -26,27 +26,26 @@ final class ImageFetchManager {
     }
     
     private func downloadImage(from url: URL, completion: @escaping (ImageModel?) -> Void) {
-        URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
-            guard let self = self else { return }
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            var result = ImageModel()
             
             if let error = error {
-                randomImage.error = "Download error: \(error.localizedDescription)"
-                completion(randomImage)
+                result.error = "Download error: \(error.localizedDescription)"
+                completion(result)
                 return
             }
             
             guard let data = data,
                   let image = UIImage(data: data),
-                  image.size.width > 162, image.size.height > 82
-            else {
-                randomImage.error = "Error: Image is too small"
-                completion(randomImage)
+                  image.size.width > 162, image.size.height > 82 else {
+                result.error = "Error: Image is too small"
+                completion(result)
                 return
             }
-            randomImage.image = image
-            randomImage.url = url.absoluteString
             
-            completion(randomImage)
+            result.image = data
+            result.url = url.absoluteString
+            completion(result)
         }.resume()
     }
 }

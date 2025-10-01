@@ -6,9 +6,16 @@
 //
 
 import UIKit
+import Foundation
 
 struct ImageModel {
     var url: String?
-    var image: UIImage?
+    var image: Data?
     var error: String?
 }
+
+extension ImageModel: Equatable {}
+
+extension ImageModel: Codable {}
+
+extension ImageModel: Hashable {}

@@ -22,7 +22,6 @@ final class WarningViewController: UIViewController {
         setupView()
         setupLayout()
     }
-
 }
 
 //MARK: - Setup View

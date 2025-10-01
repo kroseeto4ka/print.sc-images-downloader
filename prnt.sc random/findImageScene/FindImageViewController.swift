@@ -16,6 +16,10 @@ protocol IFindImageViewController: AnyObject {
 final class FindImageViewController: UIViewController {
     
     private let tryButton = UIButton()
+    private let saveButton = UIButton()
+    private let galleryButton = UIButton()
+    
+    private let buttonStack = UIStackView()
     private let image = UIImageView()
     private let infoLabel = UILabel()
     
@@ -34,13 +38,31 @@ final class FindImageViewController: UIViewController {
 private extension FindImageViewController {
     func setupView() {
         view.backgroundColor = .white
+        
         view.addSubview(tryButton)
         view.addSubview(image)
         view.addSubview(infoLabel)
-        setupTryButton()
+        view.addSubview(buttonStack)
+        
         setupInfoLabel()
         setupAction()
+        setupButtonStack()
         setupGestureRecognizers()
+    }
+    
+    func setupButtonStack() {
+        buttonStack.axis = .horizontal
+        buttonStack.alignment = .center
+        buttonStack.distribution = .equalCentering
+        buttonStack.spacing = 20
+        
+        [saveButton, tryButton, galleryButton].forEach { button in
+            buttonStack.addArrangedSubview(button)
+        }
+        
+        setupTryButton()
+        setupSaveButton()
+        setupGalleryButton()
     }
     
     func setupGestureRecognizers() {
@@ -69,6 +91,18 @@ private extension FindImageViewController {
         tryButton.layer.cornerRadius = 20
     }
     
+    func setupSaveButton() {
+        saveButton.setTitle("Save", for: .normal)
+        saveButton.backgroundColor = .green
+        saveButton.layer.cornerRadius = 20
+    }
+    
+    func setupGalleryButton() {
+        galleryButton.setTitle("Gallery", for: .normal)
+        galleryButton.backgroundColor = .orange
+        galleryButton.layer.cornerRadius = 20
+    }
+    
     func setupInfoLabel() {
         infoLabel.isHidden = true
         infoLabel.font = .systemFont(ofSize: 20, weight: .light)
@@ -93,27 +127,44 @@ private extension FindImageViewController {
         }
     }
     
-    func action() {
+    func tryAction() {
         self.clearScreen()
         self.disableButton()
         self.presenter?.fetchRandomImage()
     }
     
+    func saveAction() {
+        self.presenter?.saveImage()
+    }
+    
+    func galleryAction() {
+        self.presenter?.runImageCollectionFlow()
+    }
+    
     func setupAction() {
+        let saveAction = UIAction { _ in
+            self.saveAction()
+        }
         let tryAction = UIAction { _ in
-            self.action()
+            self.tryAction()
         }
         
+        let galleryAction = UIAction { _ in
+            self.galleryAction()
+        }
+        
+        saveButton.addAction(saveAction, for: .touchUpInside)
         tryButton.addAction(tryAction, for: .touchUpInside)
+        galleryButton.addAction(galleryAction, for: .touchUpInside)
     }
 }
 
 // MARK: - View Layout
 private extension FindImageViewController {
     func setupLayout() {
-        tryButton.translatesAutoresizingMaskIntoConstraints = false
-        image.translatesAutoresizingMaskIntoConstraints = false
-        infoLabel.translatesAutoresizingMaskIntoConstraints = false
+        [tryButton, saveButton, galleryButton, image, infoLabel, buttonStack].forEach { view in
+            view.translatesAutoresizingMaskIntoConstraints = false
+        }
         
         NSLayoutConstraint.activate([
             image.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 90),
@@ -126,17 +177,27 @@ private extension FindImageViewController {
             infoLabel.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.85),
             infoLabel.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.3),
             
-            tryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60),
-            tryButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.4),
-            tryButton.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.1),
-            tryButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            buttonStack.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60),
+            buttonStack.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.85),
+            buttonStack.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.1),
+            buttonStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            tryButton.heightAnchor.constraint(equalTo: buttonStack.heightAnchor),
+            tryButton.widthAnchor.constraint(equalToConstant: 100),
+            
+            saveButton.heightAnchor.constraint(equalTo: buttonStack.heightAnchor),
+            saveButton.widthAnchor.constraint(equalToConstant: 100),
+            
+            galleryButton.heightAnchor.constraint(equalTo: buttonStack.heightAnchor),
+            galleryButton.widthAnchor.constraint(equalToConstant: 100),
         ])
     }
 }
 
+//MARK: - IFindImageViewController
 extension FindImageViewController: IFindImageViewController {
     func display(imageModel: ImageModel) {
-        self.image.image = imageModel.image
+        self.image.image = UIImage(data: imageModel.image ?? Data())
         self.image.isUserInteractionEnabled = true
         
         self.infoLabel.text = imageModel.url
