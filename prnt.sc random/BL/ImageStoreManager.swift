@@ -19,10 +19,13 @@ class ImageStoreManager: IImageStoreManager {
             print("imageModel with no image, save haven't been completed")
             return
         }
-        var items = fetchAll()
         
-        items.append(image)
-        persist(items)
+        var items = fetchAll()
+        guard let _ = items.firstIndex(of: image) else {
+            items.append(image)
+            persist(items)
+            return
+        }
     }
     
     func fetchAll() -> [ImageModel] {
@@ -35,7 +38,7 @@ class ImageStoreManager: IImageStoreManager {
             let decoded = try decoder.decode([ImageModel].self, from: data)
             return decoded
         } catch {
-            print("❌ Decode error:", error)
+            print("Decode error:", error)
             return []
         }
     }
@@ -60,18 +63,12 @@ class ImageStoreManager: IImageStoreManager {
     private func persist(_ items: [ImageModel]) {
         let encoder = JSONEncoder()
         encoder.dataEncodingStrategy = .base64
-        
         do {
             let data = try encoder.encode(items)
             
-            // debug print JSON для проверки
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("✅ Persisted JSON:", jsonString)
-            }
-            
             defaults.set(data, forKey: key)
         } catch {
-            print("❌ Encode error:", error)
+            print("Encode error:", error)
         }
     }
 }
