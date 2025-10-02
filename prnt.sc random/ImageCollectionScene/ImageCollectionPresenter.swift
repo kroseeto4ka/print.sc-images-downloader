@@ -6,6 +6,7 @@
 //
 
 protocol IImageCollectionPresenter {
+    var router: IImageCollectionRouter { get }
     func numberOfImages() -> Int
     func fetchAllImages() -> [ImageModel]
 }

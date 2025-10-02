@@ -33,6 +33,14 @@ final class ImageCollectionViewController: UICollectionViewController {
         setupView()
     }
     
+    func presentImageDetailVC(imageModel: ImageModel) {
+        let imageDetailVC = ImageDetailViewController(imageModel: imageModel)
+        let imageDetailAssembly = ImageDetailAssembly(navigationController: self.presenter!.router.navigationController)
+        imageDetailAssembly.configure(viewController: imageDetailVC)
+        
+        present(imageDetailVC, animated: true)
+    }
+    
 }
 
 //MARK: - Setup View
@@ -45,7 +53,6 @@ extension ImageCollectionViewController {
 
 extension ImageCollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print("количество ячеек: \(presenter?.numberOfImages() ?? 0)")///DEBUG
         return presenter?.numberOfImages() ?? 0
     }
     
@@ -66,5 +73,39 @@ extension ImageCollectionViewController {
         return cell
     }
 }
+
+extension ImageCollectionViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.bounds.width * 0.42
+        let height = width * 1.25
+        return CGSize(width: width, height: height)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        insetForSectionAt section: Int) -> UIEdgeInsets {
+        
+        let layout = collectionViewLayout as! UICollectionViewFlowLayout
+        let cellWidth = layout.itemSize.width
+        let cellsPerRow = floor(collectionView.bounds.width / cellWidth)
+        
+        let totalCellWidth = cellsPerRow * cellWidth
+        let totalSpacingWidth = (cellsPerRow - 1) * layout.minimumInteritemSpacing
+        
+        let sideInset = max(0, (collectionView.bounds.width - (totalCellWidth + totalSpacingWidth)) / 2)
+        
+        return UIEdgeInsets(top: 16, left: sideInset, bottom: 16, right: sideInset)
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView,
+                                 didSelectItemAt indexPath: IndexPath) {
+        if let cell = collectionView.cellForItem(at: indexPath) as? ImageCollectionCell {
+            presentImageDetailVC(imageModel: cell.imageModel)
+        }
+    }
+}
+
 
 extension ImageCollectionViewController: IImageCollectionViewController {}

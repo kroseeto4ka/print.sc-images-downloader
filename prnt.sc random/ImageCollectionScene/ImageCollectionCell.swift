@@ -10,6 +10,7 @@ import UIKit
 final class ImageCollectionCell: UICollectionViewCell {
     
     let imageView = UIImageView()
+    var imageModel = ImageModel()
     
     let urlLabel = UILabel()
     let imageErrorLabel = {
@@ -41,6 +42,7 @@ final class ImageCollectionCell: UICollectionViewCell {
     }
     
     func configure(_ imageModel: ImageModel) {
+        self.imageModel = imageModel
         urlLabel.text = imageModel.url
         
         if let data = imageModel.image, let image = UIImage(data: data) {

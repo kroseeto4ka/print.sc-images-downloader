@@ -25,7 +25,7 @@ extension FindImageAssembly: BaseAssembly {
                                            router: router,
                                            fetchManager: fetchManager,
                                            clipboardManager: clipboardManager,
-        imageStore: ImageStoreManager())
+                                           imageStore: storeManager)
         
         findImageVC.presenter = presenter
     }

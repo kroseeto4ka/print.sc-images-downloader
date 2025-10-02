@@ -8,14 +8,14 @@
 import UIKit
 
 protocol IImageCollectionRouter {
-    
+    var navigationController: UINavigationController { get }
 }
 
 class ImageCollectionRouter {
     enum Target {
-        case findImage
+        case imageDetail
     }
-    private let navigationController: UINavigationController
+    var navigationController: UINavigationController
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -23,6 +23,4 @@ class ImageCollectionRouter {
 
 }
 
-extension ImageCollectionRouter: IImageCollectionRouter {
-    
-}
+extension ImageCollectionRouter: IImageCollectionRouter {}

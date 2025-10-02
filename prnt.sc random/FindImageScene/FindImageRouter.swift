@@ -18,27 +18,30 @@ final class FindImageRouter {
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
+    
+    private func setupImageCollectionLayout() -> UICollectionViewFlowLayout  {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 8
+        layout.minimumInteritemSpacing = 8
+        layout.sectionInset = .zero
+        layout.itemSize = CGSize(width: UIScreen.main.bounds.width * 0.9,
+                                 height: 200)
+        return layout
+    }
 }
 
 extension FindImageRouter: IFindImageRouter {
     func routeTo(target: Any) {
-        print("routeTo")
         guard let imageCollectionTarget = target as? FindImageRouter.Target else { return }
         switch imageCollectionTarget {
         case .imageCollection:
-            let layout = UICollectionViewFlowLayout()
-            
-            layout.itemSize = CGSize(width: 200, height: 200)
-            layout.minimumLineSpacing = 100
-            layout.minimumInteritemSpacing = 1
-            layout.scrollDirection = .vertical
-            
+            let layout = setupImageCollectionLayout()
             let imageCollectionVC = ImageCollectionViewController(layout: layout)
             let imageCollectionAssembly = ImageCollectionAssembly(navigationController: navigationController)
             imageCollectionAssembly.configure(viewController: imageCollectionVC)
             
             navigationController.pushViewController(imageCollectionVC, animated: true)
         }
-        
     }
 }

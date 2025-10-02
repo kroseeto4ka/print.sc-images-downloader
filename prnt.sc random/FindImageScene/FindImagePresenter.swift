@@ -66,13 +66,11 @@ extension FindImagePresenter: IFindImagePresenter {
             }
             
             if let _ = randomImage.image {
-                // ✅ Успешная картинка
                 self?.currentImage = randomImage
                 DispatchQueue.main.async {
                     self?.view?.display(imageModel: randomImage)
                 }
             } else {
-                // ❌ Ошибка
                 self?.currentImage = randomImage
                 DispatchQueue.main.async {
                     self?.view?.display(error: randomImage.error ?? "Unknown error")
