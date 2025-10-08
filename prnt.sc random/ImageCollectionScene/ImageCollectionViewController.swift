@@ -38,6 +38,10 @@ final class ImageCollectionViewController: UICollectionViewController {
         let imageDetailAssembly = ImageDetailAssembly(navigationController: self.presenter!.router.navigationController)
         imageDetailAssembly.configure(viewController: imageDetailVC)
         
+        imageDetailVC.onDataChanged = { [weak self] in
+            self?.reloadData()
+        }
+        
         present(imageDetailVC, animated: true)
     }
     
@@ -48,6 +52,10 @@ extension ImageCollectionViewController {
     func setupView() {
         collectionView.backgroundColor = .red
         collectionView.register(ImageCollectionCell.self, forCellWithReuseIdentifier: cellIdentifier)
+    }
+    
+    private func reloadData() {
+        collectionView.reloadData()
     }
 }
 
@@ -74,6 +82,7 @@ extension ImageCollectionViewController {
     }
 }
 
+//MARK: - UICollectionViewDelegateFlowLayout
 extension ImageCollectionViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,

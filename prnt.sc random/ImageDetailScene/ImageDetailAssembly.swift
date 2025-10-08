@@ -20,7 +20,9 @@ extension ImageDetailAssembly: BaseAssembly {
         guard let imageDetailVC = viewController as? ImageDetailViewController else { return }
         let router = ImageDetailRouter(navigationController: navigationController)
         let presenter = ImageDetailPresenter(view: imageDetailVC as IImageDetailViewController,
-                                           router: router, clipboardManager: ClipboardManager())
+                                             router: router,
+                                             clipboardManager: ClipboardManager(),
+                                             storeManager: ImageStoreManager())
         
         imageDetailVC.presenter = presenter
     }

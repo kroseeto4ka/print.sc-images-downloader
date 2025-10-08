@@ -14,9 +14,13 @@ final class ImageDetailViewController: UIViewController {
     
     private let image = UIImageView()
     private let infoLabel = UILabel()
+    private let deleteButton = UIButton()
+    
     private let imageModel: ImageModel
     
     var presenter: IImageDetailPresenter?
+    
+    var onDataChanged: (() -> Void)?
     
     init(imageModel: ImageModel) {
         self.imageModel = imageModel
@@ -43,9 +47,12 @@ private extension ImageDetailViewController {
         
         view.addSubview(image)
         view.addSubview(infoLabel)
+        view.addSubview(deleteButton)
         
         setupInfoLabel()
+        setupDeleteButton()
         setupGestureRecognizers()
+        addAction()
     }
     
     func setupGestureRecognizers() {
@@ -68,25 +75,39 @@ private extension ImageDetailViewController {
         presenter?.copyTappedURL(url: infoLabel.text)
     }
     
+    func deleteActionSetup() {
+        presenter?.deleteImage(imageModel: imageModel)
+        onDataChanged?()
+        dismiss(animated: true)
+    }
+    
     func setupInfoLabel() {
         infoLabel.font = .systemFont(ofSize: 20, weight: .light)
         infoLabel.textAlignment = .center
         infoLabel.numberOfLines = 0
     }
     
-    func clearScreen() {
-        image.image = .none
-        infoLabel.isHidden = true
+    func setupDeleteButton() {
+        deleteButton.setTitle("Delete", for: .normal)
+        deleteButton.backgroundColor = .red
+        deleteButton.titleLabel?.font = .systemFont(ofSize: 30, weight: .heavy)
         
-        infoLabel.isUserInteractionEnabled = false
-        image.isUserInteractionEnabled = false
+        deleteButton.layer.cornerRadius = 20
+    }
+    
+    func addAction() {
+        let deleteAction = UIAction { _ in
+            self.deleteActionSetup()
+        }
+        
+        deleteButton.addAction(deleteAction, for: .touchUpInside)
     }
 }
 
-// MARK: - View Layout
+// MARK: - Layout Setup
 private extension ImageDetailViewController {
     func setupLayout() {
-        [image, infoLabel].forEach { view in
+        [image, infoLabel, deleteButton].forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
         }
         
@@ -99,7 +120,12 @@ private extension ImageDetailViewController {
             infoLabel.topAnchor.constraint(equalTo: image.bottomAnchor, constant: 50),
             infoLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             infoLabel.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.85),
-            infoLabel.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.3)
+            infoLabel.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.3),
+            
+            deleteButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            deleteButton.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.1),
+            deleteButton.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.7),
+            deleteButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -50)
         ])
     }
 }

@@ -8,12 +8,15 @@ protocol IImageStoreManager {
     func clearAll()
 }
 
-class ImageStoreManager: IImageStoreManager {
+final class ImageStoreManager: IImageStoreManager {
     
     private let key = "savedImageModels"
     private let defaults = UserDefaults.standard
     
-    // MARK: - Public methods
+}
+
+// MARK: - Public methods
+extension ImageStoreManager {
     func save(_ image: ImageModel) {
         guard let _ = image.image else {
             print("imageModel with no image, save haven't been completed")
